@@ -39,8 +39,8 @@ export class FacadeService {
    * @param dataFim 
    * @param nomeOperadorTransacao 
    */
-  contaFindTransferencias(id: number, dataInicio: string, dataFim: string, nomeOperadorTransacao: string) {
-    return this.contaService.findTransferencias(id, dataInicio, dataFim, nomeOperadorTransacao);
+  contaFindTransacoes(id: number, dataInicio: string, dataFim: string, nomeOperadorTransacao: string) {
+    return this.contaService.findTransacoes(id, dataInicio, dataFim, nomeOperadorTransacao);
   }
 
   ////////////////////////////////////////////// NOTIFICAÇÃO //////////////////////////////////////////////

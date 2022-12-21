@@ -1,8 +1,8 @@
 import { AbstractEntity } from './abstract-entity';
 import { Conta } from './contas';
 
-export interface Transferencia extends AbstractEntity {
-    dataTransferencia: Date;
+export interface Transacao extends AbstractEntity {
+    dataTransacao: Date;
     valor: number;
     tipo: string;
     nomeOperadorTransacao: string;

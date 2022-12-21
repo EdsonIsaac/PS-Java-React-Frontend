@@ -1,8 +1,7 @@
 import { AbstractEntity } from "./abstract-entity";
-import { Transferencia } from "./transferencia";
+import { Transacao } from "./transacao";
 
 export interface Conta extends AbstractEntity {
     nomeResponsavel: string;
-    saldo: number;
-    transferencias: Array<Transferencia>;
+    transacoes: Array<Transacao>;
 }

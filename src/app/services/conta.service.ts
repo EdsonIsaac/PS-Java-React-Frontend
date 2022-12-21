@@ -1,8 +1,9 @@
-import { HttpClient, HttpRequest } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { environment } from 'src/environments/environment';
+
 import { Conta } from '../entities/contas';
-import { Transferencia } from '../entities/transferencia';
+import { Transacao } from '../entities/transacao';
 
 type Filters = {[key: string] : string}
 
@@ -37,7 +38,7 @@ export class ContaService {
    * @param dataFim 
    * @param nomeOperadorTransacao 
    */
-  findTransferencias(id: number, dataInicio: string, dataFim: string, nomeOperadorTransacao: string) {
+  findTransacoes(id: number, dataInicio: string, dataFim: string, nomeOperadorTransacao: string) {
 
     const params: Filters = {};
 
@@ -55,7 +56,7 @@ export class ContaService {
       params['operador'] = nomeOperadorTransacao;
     }
 
-    return this.http.get<Array<Transferencia>>(environment.apiURL + '/contas/' + id + '/transferencias' , {
+    return this.http.get<Array<Transacao>>(environment.apiURL + '/contas/' + id + '/transacoes' , {
       params: params
     });
   }

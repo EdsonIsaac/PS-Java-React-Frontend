@@ -4,7 +4,7 @@ import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 import { ActivatedRoute } from '@angular/router';
 import { Conta } from 'src/app/entities/contas';
-import { Transferencia } from 'src/app/entities/transferencia';
+import { Transacao } from 'src/app/entities/transacao';
 import { NotificationType } from 'src/app/enums/notification-type';
 import { FacadeService } from 'src/app/services/facade.service';
 import { MessageUtils } from 'src/app/utils/message';
@@ -20,9 +20,10 @@ export class ContaComponent implements OnInit {
   columns!: Array<String>;
   dataInicio!: string;
   dataFim!: string;
-  dataSource!: MatTableDataSource<Transferencia>;
+  dataSource!: MatTableDataSource<Transacao>;
   nomeOperadorTransacao!: string;
-  showTable!: boolean;
+  saldoPeriodo!: number;
+  saldoTotal!: number;
 
   @ViewChild(MatPaginator, { static: false }) set paginator(value: MatPaginator) { if (this.dataSource) this.dataSource.paginator = value }
   @ViewChild(MatSort, { static: false }) set sort(value: MatSort) { if (this.dataSource) this.dataSource.sort = value }
@@ -37,6 +38,8 @@ export class ContaComponent implements OnInit {
     
     this.columns = ['data', 'valor', 'tipo', 'nome-operador-transacao'];
     this.dataSource = new MatTableDataSource();
+    this.saldoPeriodo = 0;
+    this.saldoTotal = 0;
 
     this.activatedRoute.params.subscribe((x: any) => {
 
@@ -46,6 +49,7 @@ export class ContaComponent implements OnInit {
 
           next: (conta) => {
             this.conta = conta;
+            this.buildSaldoTotal();
           },
 
           error: (error) => {
@@ -54,37 +58,57 @@ export class ContaComponent implements OnInit {
           },
         });
       }
-    })
-  }
-
-  buildTable(transferencias: Array<Transferencia>) {
-
-    this.dataSource.data = transferencias;
+    });
 
     this.dataSource.sortingDataAccessor = (item: any, property: any) => {
       switch (property) {
-        case 'data': return new Date(item.dataTransferencia);
+        case 'data': return new Date(item.dataTransacao);
         default: return item[property];
       }
     };
-
-    this.showTable = true;
   }
 
-  findTransferencias() {
+  buildSaldoPeriodo() {
 
-    this.facade.contaFindTransferencias(this.conta.id, this.dataInicio, this.dataFim, this.nomeOperadorTransacao).subscribe({
+    this.facade.contaFindTransacoes(this.conta.id, this.dataInicio, this.dataFim, this.nomeOperadorTransacao).subscribe({
       
-      next: (transferencias) => {
-        this.conta.transferencias = transferencias;
-        this.buildTable(transferencias);
+      next: (transacoes) => {
+        this.buildTable(transacoes);
+        this.conta.transacoes = transacoes;
+        this.saldoPeriodo = transacoes
+          .sort((a, b) => new Date(a.dataTransacao).getTime() > new Date(b.dataTransacao).getTime() ? 1 : -1)
+          .map(t => t.valor)
+          .reduce((a, b) => a + b, 0);
       },
 
       error: (error) => {
         console.error(error);
-        this.facade.notificationShow(MessageUtils.TRANSFERENCIAS_GET_FAIL, NotificationType.FAIL);
-      },
+        this.facade.notificationShow(MessageUtils.TRANSACOES_GET_FAIL, NotificationType.FAIL);
+      }
     });
+  }
+
+  buildSaldoTotal() {
+
+    this.facade.contaFindTransacoes(this.conta.id, '', '', '').subscribe({
+
+      next: (transacoes) => {
+        this.saldoTotal = transacoes
+          .sort((a, b) => new Date(a.dataTransacao).getTime() > new Date(b.dataTransacao).getTime() ? 1 : -1)
+          .map(t => t.valor)
+          .reduce((a, b) => a + b, 0);
+      },
+
+      error: (error) => {
+        console.error(error);
+        this.facade.notificationShow(MessageUtils.TRANSACOES_GET_FAIL, NotificationType.FAIL);
+      }
+    });
+  }
+
+  buildTable(transacoes: Array<Transacao>) {
+    this.dataSource.data = transacoes;
+    this.dataSource._updateChangeSubscription();
   }
 
   setDataInicio(value: string) {
