@@ -49,7 +49,7 @@ export class ContaService {
 
     if (dataFim) {
       let array = dataFim.split('/');
-      params['fim'] = array[2] + '-' + array[1] + '-' + array[0] + 'T00:00:00';
+      params['fim'] = array[2] + '-' + array[1] + '-' + array[0] + 'T23:59:59';
     }
 
     if (nomeOperadorTransacao) {
